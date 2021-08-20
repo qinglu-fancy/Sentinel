@@ -15,6 +15,7 @@
  */
 package com.alibaba.csp.sentinel.dashboard.controller;
 
+import com.alibaba.csp.sentinel.dashboard.auth.LDAPUtil;
 import com.alibaba.csp.sentinel.dashboard.auth.AuthService;
 import com.alibaba.csp.sentinel.dashboard.auth.SimpleWebAuthServiceImpl;
 import com.alibaba.csp.sentinel.dashboard.config.DashboardConfig;
@@ -46,6 +47,9 @@ public class AuthController {
     @Value("${auth.password:sentinel}")
     private String authPassword;
 
+    @Value("${auth.adurl}")
+    private String authADUrl;
+
     @Autowired
     private AuthService<HttpServletRequest> authService;
 
@@ -58,16 +62,23 @@ public class AuthController {
         if (StringUtils.isNotBlank(DashboardConfig.getAuthPassword())) {
             authPassword = DashboardConfig.getAuthPassword();
         }
-
-        /*
-         * If auth.username or auth.password is blank(set in application.properties or VM arguments),
-         * auth will pass, as the front side validate the input which can't be blank,
-         * so user can input any username or password(both are not blank) to login in that case.
-         */
-        if (StringUtils.isNotBlank(authUsername) && !authUsername.equals(username)
-                || StringUtils.isNotBlank(authPassword) && !authPassword.equals(password)) {
-            LOGGER.error("Login failed: Invalid username or password, username=" + username);
-            return Result.ofFail(-1, "Invalid username or password");
+        
+        if (StringUtils.isNotBlank(authADUrl)){
+            if(!LDAPUtil.verifyPassword(authADUrl, username, password)){
+                LOGGER.error("Login failed: Invalid username or password, username=" + username);
+                return Result.ofFail(-1, "Invalid username or password");
+            }
+        }else{
+            /*
+            * If auth.username or auth.password is blank(set in application.properties or VM arguments),
+            * auth will pass, as the front side validate the input which can't be blank,
+            * so user can input any username or password(both are not blank) to login in that case.
+            */
+            if (StringUtils.isNotBlank(authUsername) && !authUsername.equals(username)
+                    || StringUtils.isNotBlank(authPassword) && !authPassword.equals(password)) {
+                LOGGER.error("Login failed: Invalid username or password, username=" + username);
+                return Result.ofFail(-1, "Invalid username or password");
+            }
         }
 
         AuthService.AuthUser authUser = new SimpleWebAuthServiceImpl.SimpleWebAuthUserImpl(username);
