@@ -1,7 +1,27 @@
-var app = angular.module('sentinelDashboardApp');
+var app = angular.module('sentinelDashboardApp'); 
 
 app.controller('MetricCtl', ['$scope', '$stateParams', 'MetricService', '$interval', '$timeout',
   function ($scope, $stateParams, MetricService, $interval, $timeout) {
+    //非实时查询条件
+    $scope.query_endTime = new Date();
+    $scope.query_startTime = new Date(new Date() - 5*60*1000);
+  
+    $scope.realtime_query = true; 
+    $("[name='my-checkbox']").bootstrapSwitch('state', $scope.realtime_query); //实时查询开启
+    $('input[name="my-checkbox"]').on('switchChange.bootstrapSwitch', function(event, state) {
+      // console.log(this); // DOM element
+      // console.log(event); // jQuery event
+      // console.log(state); // true | false
+      $scope.realtime_query = state;
+      if(state == false){
+        $interval.cancel(intervalId);
+        queryIdentityDatas();
+      }
+      if(state == true){
+        reInitIdentityDatas();
+      }
+
+    });
 	$scope.charts = [];
     $scope.endTime = new Date();
     $scope.startTime = new Date();
@@ -34,7 +54,12 @@ app.controller('MetricCtl', ['$scope', '$stateParams', 'MetricService', '$interv
 
     $scope.pageChanged = function (newPageNumber) {
       $scope.servicePageConfig.currentPageIndex = newPageNumber;
-      reInitIdentityDatas();
+      if($scope.realtime_query == false){
+        queryIdentityDatas();
+      }
+      if($scope.realtime_query == true){
+        reInitIdentityDatas();
+      }
     };
 
     var searchT;
@@ -54,6 +79,11 @@ app.controller('MetricCtl', ['$scope', '$stateParams', 'MetricService', '$interv
         queryIdentityDatas();
       }, DATA_REFRESH_INTERVAL);
     };
+
+    //非实时查询
+    $scope.ontimeSearch = function(){
+      queryIdentityDatas();
+    }
 
     $scope.$on('$destroy', function () {
       $interval.cancel(intervalId);
@@ -182,7 +212,9 @@ app.controller('MetricCtl', ['$scope', '$stateParams', 'MetricService', '$interv
         pageIndex: $scope.servicePageConfig.currentPageIndex,
         pageSize: $scope.servicePageConfig.pageSize,
         desc: $scope.isDescOrder,
-        searchKey: $scope.serviceQuery
+        searchKey: $scope.serviceQuery,
+        startTime: $scope.realtime_query == false ? new Date($scope.query_startTime).getTime() : "",
+        endTime: $scope.realtime_query == false ? new Date($scope.query_endTime).getTime() : "",
       };
       MetricService.queryAppSortedIdentities(params).success(function (data) {
         $scope.metrics = [];
@@ -260,10 +292,20 @@ app.controller('MetricCtl', ['$scope', '$stateParams', 'MetricService', '$interv
     $scope.isDescOrder = true;
     $scope.setDescOrder = function () {
       $scope.isDescOrder = true;
-      reInitIdentityDatas();
+      if($scope.realtime_query == false){
+        queryIdentityDatas();
+      }
+      if($scope.realtime_query == true){
+        reInitIdentityDatas();
+      }
     }
     $scope.setAscOrder = function () {
       $scope.isDescOrder = false;
-      reInitIdentityDatas();
+      if($scope.realtime_query == false){
+        queryIdentityDatas();
+      }
+      if($scope.realtime_query == true){
+        reInitIdentityDatas();
+      }
     }
   }]);

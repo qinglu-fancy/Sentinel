@@ -397,3 +397,17 @@ table.dataTable thead .sorting:after {
 .panel-yellow a:hover {
     color: #df8a13;
 }
+
+.bootstrap-switch {
+    -webkit-border-radius:15px;
+    -moz-border-radius:15px;
+    border-radius: 15px;
+}
+.bootstrap-switch.bootstrap-switch-small .bootstrap-switch-handle-on,
+.bootstrap-switch.bootstrap-switch-small .bootstrap-switch-handle-off,
+.bootstrap-switch.bootstrap-switch-small .bootstrap-switch-label {
+    -webkit-border-radius:50%;
+    -moz-border-radius:50%;
+  border-radius: 50%;
+}
+
