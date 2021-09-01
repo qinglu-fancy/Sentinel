@@ -1,7 +1,7 @@
 var app = angular.module('sentinelDashboardApp'); 
 
-app.controller('MetricCtl', ['$scope', '$stateParams', 'MetricService', '$interval', '$timeout',
-  function ($scope, $stateParams, MetricService, $interval, $timeout) {
+app.controller('MetricCtl', ['$scope', '$stateParams', 'MetricService', '$interval', '$timeout','ngDialog',
+  function ($scope, $stateParams, MetricService, $interval, $timeout,ngDialog) {
     //非实时查询条件
     $scope.query_endTime = new Date();
     $scope.query_startTime = new Date(new Date() - 5*60*1000);
@@ -22,6 +22,32 @@ app.controller('MetricCtl', ['$scope', '$stateParams', 'MetricService', '$interv
       }
 
     });
+
+    //时间change事件
+    $scope.timechange = function(type){
+      var diff = $scope.query_endTime - $scope.query_startTime;
+      if(type == 'start'){
+        //设定endtime
+         if(diff > 60*60*1000){
+          $scope.query_endTime = new Date(($scope.query_startTime).getTime() + 30*60*1000);
+         }
+         if(diff <= 0){
+          $scope.query_endTime = new Date(($scope.query_startTime).getTime() + 30*60*1000)
+         }
+         
+      }
+      if(type == 'end'){
+        //设定endtime
+        if(diff > 60*60*1000){
+          $scope.query_startTime = new Date(($scope.query_endTime).getTime() - 30*60*1000);
+         }
+         if(diff <= 0){
+          $scope.query_startTime = new Date(($scope.query_endTime).getTime() - 30*60*1000)
+         }
+      }
+       
+    };
+
 	$scope.charts = [];
     $scope.endTime = new Date();
     $scope.startTime = new Date();
@@ -82,6 +108,7 @@ app.controller('MetricCtl', ['$scope', '$stateParams', 'MetricService', '$interv
 
     //非实时查询
     $scope.ontimeSearch = function(){
+
       queryIdentityDatas();
     }
 
@@ -246,8 +273,11 @@ app.controller('MetricCtl', ['$scope', '$stateParams', 'MetricService', '$interv
           // push an empty element in the last, for ng-init reasons.
           $scope.metrics.push([]);
         } else {
+          ngDialog.closeAll();
           $scope.emptyServices = true;
           console.log(data.msg);
+          //错误提醒
+          ngDialog.open({ template: '<p>提示</p><span>'+data.msg+'</span>',plain:true });
         }
       });
     };

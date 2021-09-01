@@ -31,6 +31,13 @@ angular.module('sentinelDashboardApp')
                 // Handle appType
                 item.isGateway = item.appType === 1 || item.appType === 11 || item.appType === 12;
 
+                if(item.app.match(/.+\.xms\.foxhis\.com$/)){
+                  item.app_show = item.app.slice(0,-15);
+                }
+                else{
+                  item.app_show = item.app;
+                }
+                
                 if (item.shown) {
                   return item;
                 }
