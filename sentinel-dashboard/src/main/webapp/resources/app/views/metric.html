@@ -29,10 +29,10 @@
           <button class="btn btn-outline-primary" style="float: right;margin-right: 10px;height: 30px;font-size: 12px;" ng-click="ontimeSearch()" ng-disabled="realtime_query==true"
            >查询</button>
           <input type="datetime-local" name="timeinput" ng-model="query_endTime" class="form-control " style="width: 208px;"
-          placeholder="yyyy-MM-ddTHH:mm:ss"   required   ng-disabled="realtime_query==true"/>
+          placeholder="yyyy-MM-ddTHH:mm:ss"   required   ng-disabled="realtime_query==true"/ ng-change="timechange('end')">
           <span style="float: right;line-height: 2;">~</span>
           <input type="datetime-local" name="timeinput" ng-model="query_startTime" class="form-control " style="width: 208px;"
-          placeholder="yyyy-MM-ddTHH:mm:ss"   required   ng-disabled="realtime_query==true"/>
+          placeholder="yyyy-MM-ddTHH:mm:ss"   required   ng-disabled="realtime_query==true" ng-change="timechange('start')"/>
         </div>
         <!--.tools-header -->
         <!--<div id="g2container"></div>-->
