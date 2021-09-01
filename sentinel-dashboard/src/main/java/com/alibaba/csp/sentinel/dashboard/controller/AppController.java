@@ -28,6 +28,7 @@ import com.alibaba.csp.sentinel.dashboard.discovery.MachineInfo;
 import com.alibaba.csp.sentinel.dashboard.domain.Result;
 import com.alibaba.csp.sentinel.dashboard.domain.vo.MachineInfoVo;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -40,6 +41,10 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping(value = "/app")
 public class AppController {
+
+    @Value("${sentinel.dashboard.appsuffix}")
+    private String appsuffix;
+
 
     @Autowired
     private AppManagement appManagement;
@@ -81,6 +86,10 @@ public class AppController {
         } else {
             return Result.ofFail(1, "remove failed");
         }
+    }
+    @GetMapping("/suffix.json")
+    public Result<String> appsuffixOfApps(HttpServletRequest request) {
+        return Result.ofSuccess(appsuffix);
     }
 
     @GetMapping("/{app}/empty.json")
