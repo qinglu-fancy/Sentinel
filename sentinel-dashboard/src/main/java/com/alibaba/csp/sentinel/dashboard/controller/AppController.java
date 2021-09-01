@@ -82,4 +82,10 @@ public class AppController {
             return Result.ofFail(1, "remove failed");
         }
     }
+
+    @GetMapping("/{app}/empty.json")
+    public Result<String> emptyApp(@PathVariable("app") String app) {
+        appManagement.addMachine(MachineInfo.of(app,"127.0.0.1",-1));
+        return Result.ofSuccess("empty over");
+    }
 }
