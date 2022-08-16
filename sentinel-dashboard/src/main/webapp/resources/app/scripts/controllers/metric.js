@@ -1,12 +1,12 @@
-var app = angular.module('sentinelDashboardApp'); 
+var app = angular.module('sentinelDashboardApp');
 
 app.controller('MetricCtl', ['$scope', '$stateParams', 'MetricService', '$interval', '$timeout','ngDialog',
   function ($scope, $stateParams, MetricService, $interval, $timeout,ngDialog) {
     //非实时查询条件
     $scope.query_endTime = new Date();
     $scope.query_startTime = new Date(new Date() - 5*60*1000);
-  
-    $scope.realtime_query = true; 
+
+    $scope.realtime_query = true;
     $("[name='my-checkbox']").bootstrapSwitch('state', $scope.realtime_query); //实时查询开启
     $('input[name="my-checkbox"]').on('switchChange.bootstrapSwitch', function(event, state) {
       // console.log(this); // DOM element
@@ -28,27 +28,27 @@ app.controller('MetricCtl', ['$scope', '$stateParams', 'MetricService', '$interv
       var diff = $scope.query_endTime - $scope.query_startTime;
       if(type == 'start'){
         //设定endtime
-         if(diff > 60*60*1000){
+        if(diff > 60*60*1000){
           $scope.query_endTime = new Date(($scope.query_startTime).getTime() + 30*60*1000);
-         }
-         if(diff <= 0){
+        }
+        if(diff <= 0){
           $scope.query_endTime = new Date(($scope.query_startTime).getTime() + 30*60*1000)
-         }
-         
+        }
+
       }
       if(type == 'end'){
         //设定endtime
         if(diff > 60*60*1000){
           $scope.query_startTime = new Date(($scope.query_endTime).getTime() - 30*60*1000);
-         }
-         if(diff <= 0){
-          $scope.query_startTime = new Date(($scope.query_endTime).getTime() - 30*60*1000)
-         }
+        }
+        if(diff <= 0){
+          $scope.query_startTime = new Date(($scope.query_endTime).getTime() - 30*60*1000);
+        }
       }
-       
+
     };
 
-	$scope.charts = [];
+    $scope.charts = [];
     $scope.endTime = new Date();
     $scope.startTime = new Date();
     $scope.startTime.setMinutes($scope.endTime.getMinutes() - 30);
@@ -118,8 +118,8 @@ app.controller('MetricCtl', ['$scope', '$stateParams', 'MetricService', '$interv
     $scope.initAllChart = function () {
       //revoke useless charts positively
       while($scope.charts.length > 0) {
-      	let chart = $scope.charts.pop();
-      	chart.destroy();
+        let chart = $scope.charts.pop();
+        chart.destroy();
       }
       $.each($scope.metrics, function (idx, metric) {
         if (idx == $scope.metrics.length - 1) {
@@ -132,6 +132,7 @@ app.controller('MetricCtl', ['$scope', '$stateParams', 'MetricService', '$interv
           height: 250,
           padding: [10, 30, 70, 50]
         });
+
         $scope.charts.push(chart);
         var maxQps = 0;
         for (var i in metric.data) {
@@ -143,11 +144,43 @@ app.controller('MetricCtl', ['$scope', '$stateParams', 'MetricService', '$interv
             maxQps = item.blockQps;
           }
         }
+
+
+        //单点的平均值
+        // for(let i =0;i<metric.data.length;i++){
+        //   metric.data[i]['avg'] =  (metric.data[i]['blockQps'] + metric.data[i]['passQps']) / 2;
+        // }
+
+
+        //计算所有通过的值
+        let sum = 0;
+        for(let i =0;i<metric.data.length;i++){
+          sum += metric.data[i]['passQps'];
+        }
+
+
+        //添加一条直线的平均值
+        for(let i =0;i<metric.data.length;i++){
+          metric.data[i]['avg'] =  (sum / metric.data.length).toFixed(2);
+        }
+
+        //把内容添加进图表
         chart.source(metric.data);
+        console.log(metric.data);
+
+
         chart.scale('timestamp', {
           type: 'time',
           mask: 'YYYY-MM-DD HH:mm:ss'
         });
+
+        chart.scale('avg', {
+          max: maxQps,
+          min: 0,
+          fine: true,
+          alias: '平均'
+        });
+
         chart.scale('passQps', {
           min: 0,
           max: maxQps,
@@ -155,12 +188,15 @@ app.controller('MetricCtl', ['$scope', '$stateParams', 'MetricService', '$interv
           alias: '通过 QPS'
           // max: 10
         });
+
+
         chart.scale('blockQps', {
           min: 0,
           max: maxQps,
           fine: true,
           alias: '拒绝 QPS',
         });
+
         chart.scale('rt', {
           min: 0,
           fine: true,
@@ -169,6 +205,7 @@ app.controller('MetricCtl', ['$scope', '$stateParams', 'MetricService', '$interv
           grid: null,
           label: null
         });
+
         chart.axis('blockQps', {
           grid: null,
           label: null
@@ -199,12 +236,16 @@ app.controller('MetricCtl', ['$scope', '$stateParams', 'MetricService', '$interv
             if ('blockQps' === val) {
               return '拒绝 QPS';
             }
+            if ('avg' === val) {
+              return '平均';
+            }
             return val;
           },
           items: [
             { value: 'passQps', marker: { symbol: 'hyphen', stroke: 'green', radius: 5, lineWidth: 2 } },
             { value: 'blockQps', marker: { symbol: 'hyphen', stroke: 'blue', radius: 5, lineWidth: 2 } },
-            //{ value: 'rt', marker: {symbol: 'hyphen', stroke: 'gray', radius: 5, lineWidth: 2} },
+            { value: 'avg', marker: { symbol: 'hyphen', stroke: 'red', radius: 5, lineWidth: 2 } },
+            // { value: 'rt', marker: {symbol: 'hyphen', stroke: 'gray', radius: 5, lineWidth: 2} },
           ],
           onClick: function (ev) {
             const item = ev.item;
@@ -225,7 +266,8 @@ app.controller('MetricCtl', ['$scope', '$stateParams', 'MetricService', '$interv
         });
         chart.line().position('timestamp*passQps').size(1).color('green').shape('smooth');
         chart.line().position('timestamp*blockQps').size(1).color('blue').shape('smooth');
-        //chart.line().position('timestamp*rt').size(1).color('gray').shape('smooth');
+        chart.line().position('timestamp*avg').size(1).color('red').shape('smooth');
+        // chart.line().position('timestamp*rt').size(1).color('gray').shape('smooth');
         G2.track(false);
         chart.render();
       });
@@ -249,6 +291,7 @@ app.controller('MetricCtl', ['$scope', '$stateParams', 'MetricService', '$interv
         if (data.code === 0 && data.data) {
           var metricsObj = data.data.metric;
           var identityNames = Object.keys(metricsObj);
+
           if (identityNames.length < 1) {
             $scope.emptyServices = true;
           } else {
@@ -270,8 +313,29 @@ app.controller('MetricCtl', ['$scope', '$stateParams', 'MetricService', '$interv
             metrics.shortData = lastOfArray(identityDatas, 6);
             $scope.metrics.push(metrics);
           });
+
+
+
+
           // push an empty element in the last, for ng-init reasons.
           $scope.metrics.push([]);
+
+
+          // $scope.metrics[0]['data'].push({
+          //   "id": null,
+          //   "app": "adbjr.xms.foxhis.com",
+          //   "timestamp": 1660550400000,
+          //   "gmtCreate": 1660550586000,
+          //   "resource": "MOD",
+          //   "passQps": 2,
+          //   "blockQps": 0,
+          //   "successQps": 0,
+          //   "exceptionQps": 0,
+          //   "rt": 97,
+          //   "count": 1,
+          //   "$$hashKey": "object:3925"
+          // })
+
         } else {
           ngDialog.closeAll();
           $scope.emptyServices = true;
@@ -293,13 +357,13 @@ app.controller('MetricCtl', ['$scope', '$stateParams', 'MetricService', '$interv
         if (curTime > lastTime + 1) {
           for (var j = lastTime + 1; j < curTime; j++) {
             filledData.push({
-                "timestamp": j * 1000,
-                "passQps": 0,
-                "blockQps": 0,
-                "successQps": 0,
-                "exception": 0,
-                "rt": 0,
-                "count": 0
+              "timestamp": j * 1000,
+              "passQps": 0,
+              "blockQps": 0,
+              "successQps": 0,
+              "exception": 0,
+              "rt": 0,
+              "count": 0
             })
           }
         }
