@@ -26,8 +26,8 @@ app.controller('MetricCtl', ['$scope', '$stateParams', 'MetricService', '$interv
     //时间change事件
     $scope.timechange = function(type){
       var diff = $scope.query_endTime - $scope.query_startTime;
-      if(type == 'start'){
-        //设定endtime
+      if(type === 'start'){
+        设定endtime
         if(diff > 60*60*1000){
           $scope.query_endTime = new Date(($scope.query_startTime).getTime() + 30*60*1000);
         }
@@ -35,15 +35,23 @@ app.controller('MetricCtl', ['$scope', '$stateParams', 'MetricService', '$interv
           $scope.query_endTime = new Date(($scope.query_startTime).getTime() + 30*60*1000)
         }
 
+
+
       }
-      if(type == 'end'){
+
+      if(type === 'end'){
+        // alert("666");
         //设定endtime
-        if(diff > 60*60*1000){
-          $scope.query_startTime = new Date(($scope.query_endTime).getTime() - 30*60*1000);
-        }
-        if(diff <= 0){
-          $scope.query_startTime = new Date(($scope.query_endTime).getTime() - 30*60*1000);
-        }
+        // if(diff > 60*60*1000){
+        //   $scope.query_startTime = new Date(($scope.query_endTime).getTime() - 30*60*1000);
+        // }
+        // if(diff <= 0){
+        //   $scope.query_startTime = new Date(($scope.query_endTime).getTime() - 30*60*1000);
+        // }
+
+        //开始时间是结束时间往前五分钟
+        $scope.query_startTime = new Date(($scope.query_endTime).getTime() - 5*60*1000);
+
       }
 
     };
@@ -54,6 +62,8 @@ app.controller('MetricCtl', ['$scope', '$stateParams', 'MetricService', '$interv
     $scope.startTime.setMinutes($scope.endTime.getMinutes() - 30);
     $scope.startTimeFmt = formatDate($scope.startTime);
     $scope.endTimeFmt = formatDate($scope.endTime);
+    //向前按钮是否可用点击
+    $scope.timeForwardBottonIsActive = true;
     function formatDate(date) {
       return moment(date).format('YYYY/MM/DD HH:mm:ss');
     }
@@ -110,7 +120,37 @@ app.controller('MetricCtl', ['$scope', '$stateParams', 'MetricService', '$interv
     $scope.ontimeSearch = function(){
 
       queryIdentityDatas();
-    }
+    };
+
+
+
+    //点击向后
+    $scope.timeBackward = function (){
+      //结束时间增加5分钟
+      $scope.query_endTime = new Date(($scope.query_endTime).getTime() - 5*60*1000);
+      $scope.query_startTime = new Date(($scope.query_startTime).getTime() - 5*60*1000);
+      if($scope.query_startTime > new Date()){
+        $scope.timeForwardBottonIsActive = false;
+      }else {
+        $scope.timeForwardBottonIsActive = true;
+      }
+      $scope.ontimeSearch();
+    };
+
+    //点击向前
+    $scope.timeForward = function (){
+      //结束时间减少五分钟
+      $scope.query_endTime = new Date(($scope.query_endTime).getTime() + 5*60*1000);
+      $scope.query_startTime = new Date(($scope.query_startTime).getTime() + 5*60*1000);
+      if($scope.query_startTime > new Date()){
+        $scope.timeForwardBottonIsActive = false;
+      }else {
+        $scope.timeForwardBottonIsActive = true;
+      }
+      $scope.ontimeSearch();
+    };
+
+
 
     $scope.$on('$destroy', function () {
       $interval.cancel(intervalId);
