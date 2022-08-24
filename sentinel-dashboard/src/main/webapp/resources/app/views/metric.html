@@ -36,13 +36,13 @@
                   style="float: right;margin-right: 10px;height: 30px;font-size: 12px;"
                   ng-disabled="realtime_query==true"
                   ng-click="timeBackward()"
-          >向后</button>
+          >向前</button>
 
           <button class="btn btn-outline-primary"
                   style="float: right;margin-right: 10px;height: 30px;font-size: 12px;"
                   ng-disabled="realtime_query == true || timeForwardBottonIsActive == false"
                   ng-click="timeForward()"
-          >向前</button>
+          >向后</button>
 
 
                     <input type="datetime-local" name="timeinput" ng-model="query_endTime" class="form-control " style="width: 208px;"
