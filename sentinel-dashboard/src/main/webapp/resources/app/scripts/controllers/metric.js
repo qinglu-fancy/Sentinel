@@ -63,7 +63,7 @@ app.controller('MetricCtl', ['$scope', '$stateParams', 'MetricService', '$interv
     $scope.startTimeFmt = formatDate($scope.startTime);
     $scope.endTimeFmt = formatDate($scope.endTime);
     //向前按钮是否可用点击
-    $scope.timeForwardBottonIsActive = true;
+    $scope.timeForwardBottonIsActive = false;
     function formatDate(date) {
       return moment(date).format('YYYY/MM/DD HH:mm:ss');
     }
@@ -129,7 +129,7 @@ app.controller('MetricCtl', ['$scope', '$stateParams', 'MetricService', '$interv
       //结束时间增加5分钟
       $scope.query_endTime = new Date(($scope.query_endTime).getTime() - 5*60*1000);
       $scope.query_startTime = new Date(($scope.query_startTime).getTime() - 5*60*1000);
-      if($scope.query_startTime > new Date()){
+      if($scope.query_startTime > new Date(new Date().getTime() - 5*60*1000)){
         $scope.timeForwardBottonIsActive = false;
       }else {
         $scope.timeForwardBottonIsActive = true;
@@ -142,7 +142,7 @@ app.controller('MetricCtl', ['$scope', '$stateParams', 'MetricService', '$interv
       //结束时间减少五分钟
       $scope.query_endTime = new Date(($scope.query_endTime).getTime() + 5*60*1000);
       $scope.query_startTime = new Date(($scope.query_startTime).getTime() + 5*60*1000);
-      if($scope.query_startTime > new Date()){
+      if($scope.query_startTime > new Date(new Date().getTime() - 5*60*1000)){
         $scope.timeForwardBottonIsActive = false;
       }else {
         $scope.timeForwardBottonIsActive = true;
@@ -150,6 +150,14 @@ app.controller('MetricCtl', ['$scope', '$stateParams', 'MetricService', '$interv
       $scope.ontimeSearch();
     };
 
+    //监听时间改变
+    $scope.$watch('query_endTime', function (newVal, oldVal) {
+      if (newVal !== oldVal) {
+        $scope.query_endTime = newVal;
+        $scope.query_startTime = new Date(new Date($scope.query_endTime).getTime() - (5 * 60 * 1000));
+        $scope.ontimeSearch();
+      }
+    }, true);
 
 
     $scope.$on('$destroy', function () {
