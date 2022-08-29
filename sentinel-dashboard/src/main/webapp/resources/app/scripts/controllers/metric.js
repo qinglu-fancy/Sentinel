@@ -130,6 +130,8 @@ app.controller('MetricCtl', ['$scope', '$stateParams', 'MetricService', '$interv
       //结束时间增加5分钟
       $scope.query_endTime = new Date(($scope.query_endTime).getTime() - 5*60*1000);
       $scope.query_startTime = new Date(($scope.query_startTime).getTime() - 5*60*1000);
+
+
       if($scope.query_startTime > new Date(new Date().getTime() - 5*60*1000)){
         $scope.timeForwardBottonIsActive = false;
       }else {
@@ -144,6 +146,13 @@ app.controller('MetricCtl', ['$scope', '$stateParams', 'MetricService', '$interv
       //结束时间减少五分钟
       $scope.query_endTime = new Date(($scope.query_endTime).getTime() + 5*60*1000);
       $scope.query_startTime = new Date(($scope.query_startTime).getTime() + 5*60*1000);
+
+      //如果向后的时间超出此刻，则把时间设置为此刻
+      if($scope.query_endTime > new Date()){
+        $scope.query_endTime = new Date();
+        $scope.timeForwardBottonIsActive = false;
+      }
+
       if($scope.query_startTime > new Date(new Date().getTime() - 5*60*1000)){
         $scope.timeForwardBottonIsActive = false;
       }else {
