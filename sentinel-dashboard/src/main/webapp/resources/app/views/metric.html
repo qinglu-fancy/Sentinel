@@ -31,18 +31,20 @@
                   ng-click="ontimeSearch()"
                   ng-disabled="realtime_query==true"
            >查询</button>
-
+           <button class="btn btn-outline-primary"
+                  style="float: right;margin-right: 10px;height: 30px;font-size: 12px;"
+                  ng-disabled="realtime_query == true || timeForwardBottonIsActive == false"
+                  ng-click="timeForward()"
+                  title="设置查询时间往后五分钟"
+          >向后</button>
           <button class="btn btn-outline-primary"
                   style="float: right;margin-right: 10px;height: 30px;font-size: 12px;"
                   ng-disabled="realtime_query==true"
                   ng-click="timeBackward()"
+                  title="设置查询时间往前五分钟"
           >向前</button>
 
-          <button class="btn btn-outline-primary"
-                  style="float: right;margin-right: 10px;height: 30px;font-size: 12px;"
-                  ng-disabled="realtime_query == true || timeForwardBottonIsActive == false"
-                  ng-click="timeForward()"
-          >向后</button>
+          
 
 
                     <input type="datetime-local" name="timeinput" ng-model="query_endTime" class="form-control " style="width: 208px;"
@@ -123,22 +125,22 @@
             pagination-id="servicesPagination"></li>
         </div>
 
-        <div class="pagination-footer" style="margin-top:5px;">
+        <!-- <div class="pagination-footer" style="margin-top:5px;">
           <dir-pagination-controls boundary-links="true" template-url="app/views/pagination.tpl.html" pagination-id="servicesPagination"
             on-page-change="pageChanged(newPageNumber)">
           </dir-pagination-controls>
           <div class="tools" style="">
             <span>共 {{emptyObjs.length}} 条记录, </span>
             <span>
-              每页 {{servicePageConfig.pageSize}} 条记录
+              每页 {{servicePageConfig.pageSize}} 条记录 -->
               <!--每页-->
               <!--<input class="form-control" ng-model="servicePageConfig.pageSize" ng-change="pageSizeChanged()">-->
               <!--条记录,-->
-            </span>
+            <!-- </span>
             <span>第 {{servicePageConfig.currentPageIndex}} / {{servicePageConfig.totalPage}} 页</span>
-          </div>
+          </div> -->
           <!-- .tools -->
-        </div>
+        <!-- </div> -->
         <!-- pagination-footer -->
         <div class="row" style="margin-bottom:20px"></div>
       </div>
