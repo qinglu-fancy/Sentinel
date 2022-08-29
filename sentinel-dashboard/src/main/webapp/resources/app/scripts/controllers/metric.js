@@ -135,7 +135,8 @@ app.controller('MetricCtl', ['$scope', '$stateParams', 'MetricService', '$interv
       }else {
         $scope.timeForwardBottonIsActive = true;
       }
-      $scope.ontimeSearch();
+      //点击向前/向后不需要查询，因为改变事件的事件会自动触发查询
+      // $scope.ontimeSearch();
     };
 
     //点击向前
@@ -148,7 +149,8 @@ app.controller('MetricCtl', ['$scope', '$stateParams', 'MetricService', '$interv
       }else {
         $scope.timeForwardBottonIsActive = true;
       }
-      $scope.ontimeSearch();
+      //点击向前/向后不需要查询，因为改变事件的事件会自动触发查询
+      // $scope.ontimeSearch();
     };
 
     //监听时间改变
