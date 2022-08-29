@@ -21,24 +21,45 @@
             ng-if="isDescOrder">升序</button>
 
           <input class="form-control witdh-200" placeholder="关键字" ng-model="serviceQuery" ng-change="searchService()" style="margin-right: 20px;">
-          
+
           <div style="float:right;">
             实时：<input type="checkbox" name="my-checkbox" 	data-size="small" ng-model="realtime_query" data-on-text="" data-off-text="" data-handle-width="8" data-label-width="2" >
-          
+
           </div>
-          <button class="btn btn-outline-primary" style="float: right;margin-right: 10px;height: 30px;font-size: 12px;" ng-click="ontimeSearch()" ng-disabled="realtime_query==true"
+          <button class="btn btn-outline-primary"
+                  style="float: right;margin-right: 10px;height: 30px;font-size: 12px;"
+                  ng-click="ontimeSearch()"
+                  ng-disabled="realtime_query==true"
            >查询</button>
-          <input type="datetime-local" name="timeinput" ng-model="query_endTime" class="form-control " style="width: 208px;"
-          placeholder="yyyy-MM-ddTHH:mm:ss"   required   ng-disabled="realtime_query==true"/ ng-change="timechange('end')">
-          <span style="float: right;line-height: 2;">~</span>
-          <input type="datetime-local" name="timeinput" ng-model="query_startTime" class="form-control " style="width: 208px;"
-          placeholder="yyyy-MM-ddTHH:mm:ss"   required   ng-disabled="realtime_query==true" ng-change="timechange('start')"/>
+
+          <button class="btn btn-outline-primary"
+                  style="float: right;margin-right: 10px;height: 30px;font-size: 12px;"
+                  ng-disabled="realtime_query==true"
+                  ng-click="timeBackward()"
+          >向前</button>
+
+          <button class="btn btn-outline-primary"
+                  style="float: right;margin-right: 10px;height: 30px;font-size: 12px;"
+                  ng-disabled="realtime_query == true || timeForwardBottonIsActive == false"
+                  ng-click="timeForward()"
+          >向后</button>
+
+
+                    <input type="datetime-local" name="timeinput" ng-model="query_endTime" class="form-control " style="width: 208px;"
+          placeholder="yyyy-MM-ddTHH:mm:ss"   required   ng-disabled="realtime_query==true" ng-change="timechange('end')">
+
+          <!--          <span style="float: right;line-height: 2;">~</span>-->
+          <!--         删除开始时间-->
+<!--          <input type="datetime-local" name="timeinput" ng-model="query_startTime" class="form-control " style="width: 208px;"-->
+<!--          placeholder="yyyy-MM-ddTHH:mm:ss"   required   ng-disabled="realtime_query==true" ng-change="timechange('start')"/>-->
+
+
         </div>
         <!--.tools-header -->
         <!--<div id="g2container"></div>-->
         <div class="card-body">
           <div class="row" style="margin-left: 3px;margin-right: 3px;">
-            <div class="card-body" style="padding: 0px 0px;">
+            <div class="card-body" style="padding: 0 0;">
               <div class="col-md-12" ng-repeat="metric in metrics" style="padding-left: 10px;padding-right: 10px;">
 
                 <span ng-if="$index == metrics.length-1" ng-init="initAllChart()"></span>
