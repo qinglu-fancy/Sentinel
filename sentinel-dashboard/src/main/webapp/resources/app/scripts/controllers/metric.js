@@ -15,7 +15,8 @@ app.controller('MetricCtl', ['$scope', '$stateParams', 'MetricService', '$interv
       $scope.realtime_query = state;
       if(state == false){
         $interval.cancel(intervalId);
-        queryIdentityDatas();
+        //实时监控转非实时监控的时候不进行查询
+        // queryIdentityDatas();
       }
       if(state == true){
         reInitIdentityDatas();
