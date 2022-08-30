@@ -1471,11 +1471,13 @@ body {
 
 .bootstrap-switch.bootstrap-switch-on {
     border-color: #337ab7;
+    border-radius: 20px;
 }
 
 .bootstrap-switch .bootstrap-switch-handle-on.bootstrap-switch-success, .bootstrap-switch .bootstrap-switch-handle-off.bootstrap-switch-success {
     color: #fff;
     background: #337ab7;
+    border-radius: 50%;
 }
 
 .selectize-input-200 > .selectize-input {
