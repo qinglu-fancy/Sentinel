@@ -15,7 +15,8 @@ app.controller('MetricCtl', ['$scope', '$stateParams', 'MetricService', '$interv
       $scope.realtime_query = state;
       if(state == false){
         $interval.cancel(intervalId);
-        queryIdentityDatas();
+        //实时监控转非实时监控的时候不进行查询
+        // queryIdentityDatas();
       }
       if(state == true){
         reInitIdentityDatas();
@@ -129,12 +130,15 @@ app.controller('MetricCtl', ['$scope', '$stateParams', 'MetricService', '$interv
       //结束时间增加5分钟
       $scope.query_endTime = new Date(($scope.query_endTime).getTime() - 5*60*1000);
       $scope.query_startTime = new Date(($scope.query_startTime).getTime() - 5*60*1000);
+
+
       if($scope.query_startTime > new Date(new Date().getTime() - 5*60*1000)){
         $scope.timeForwardBottonIsActive = false;
       }else {
         $scope.timeForwardBottonIsActive = true;
       }
-      $scope.ontimeSearch();
+      //点击向前/向后不需要查询，因为改变事件的事件会自动触发查询
+      // $scope.ontimeSearch();
     };
 
     //点击向前
@@ -142,12 +146,20 @@ app.controller('MetricCtl', ['$scope', '$stateParams', 'MetricService', '$interv
       //结束时间减少五分钟
       $scope.query_endTime = new Date(($scope.query_endTime).getTime() + 5*60*1000);
       $scope.query_startTime = new Date(($scope.query_startTime).getTime() + 5*60*1000);
+
+      //如果向后的时间超出此刻，则把时间设置为此刻
+      if($scope.query_endTime > new Date()){
+        $scope.query_endTime = new Date();
+        $scope.timeForwardBottonIsActive = false;
+      }
+
       if($scope.query_startTime > new Date(new Date().getTime() - 5*60*1000)){
         $scope.timeForwardBottonIsActive = false;
       }else {
         $scope.timeForwardBottonIsActive = true;
       }
-      $scope.ontimeSearch();
+      //点击向前/向后不需要查询，因为改变事件的事件会自动触发查询
+      // $scope.ontimeSearch();
     };
 
     //监听时间改变
@@ -183,7 +195,6 @@ app.controller('MetricCtl', ['$scope', '$stateParams', 'MetricService', '$interv
 
         $scope.charts.push(chart);
         var maxQps = 0;
-
         for (var i in metric.data) {
           var item = metric.data[i];
           if (item.passQps > maxQps) {
