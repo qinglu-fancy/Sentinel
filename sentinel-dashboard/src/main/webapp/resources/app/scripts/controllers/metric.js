@@ -203,43 +203,21 @@ app.controller('MetricCtl', ['$scope', '$stateParams', 'MetricService', '$interv
           if (item.blockQps > maxQps) {
             maxQps = item.blockQps;
           }
+          //添加一条直线的平均值
+          item.avg = Number(metric.avg);
         }
 
-
-        //单点的平均值
-        // for(let i =0;i<metric.data.length;i++){
-        //   metric.data[i]['avg'] =  (metric.data[i]['blockQps'] + metric.data[i]['passQps']) / 2;
-        // }
-
-
-        //计算所有通过的值
-        let sum = 0;
-        for(let i =0;i<metric.data.length;i++){
-          sum += metric.data[i]['passQps'];
-        }
-
-
-        //添加一条直线的平均值
-        for(let i =0;i<metric.data.length;i++){
-          metric.data[i]['avg'] =  (sum / metric.data.length).toFixed(2);
-        }
 
         //把内容添加进图表
         chart.source(metric.data);
-        console.log(metric.data);
 
 
         chart.scale('timestamp', {
           type: 'time',
           mask: 'YYYY-MM-DD HH:mm:ss'
         });
-
-        chart.scale('avg', {
-          max: maxQps,
-          min: 0,
-          fine: true,
-          alias: '平均'
-        });
+        
+        
 
         chart.scale('passQps', {
           min: 0,
@@ -248,25 +226,34 @@ app.controller('MetricCtl', ['$scope', '$stateParams', 'MetricService', '$interv
           alias: '通过 QPS'
           // max: 10
         });
-
-
         chart.scale('blockQps', {
           min: 0,
           max: maxQps,
           fine: true,
           alias: '拒绝 QPS',
         });
+        chart.scale('avg', {
+          min: 0,
+          max: maxQps,
+          fine: true,
+          alias: '平均 QPS'
+        });
 
         chart.scale('rt', {
           min: 0,
           fine: true,
         });
+
         chart.axis('rt', {
           grid: null,
           label: null
         });
 
         chart.axis('blockQps', {
+          grid: null,
+          label: null
+        });
+        chart.axis('avg', {
           grid: null,
           label: null
         });
@@ -285,6 +272,7 @@ app.controller('MetricCtl', ['$scope', '$stateParams', 'MetricService', '$interv
             }
           }
         });
+
         chart.legend({
           custom: true,
           position: 'bottom',
@@ -297,7 +285,7 @@ app.controller('MetricCtl', ['$scope', '$stateParams', 'MetricService', '$interv
               return '拒绝 QPS';
             }
             if ('avg' === val) {
-              return '平均';
+              return '平均 QPS';
             }
             return val;
           },
@@ -369,7 +357,22 @@ app.controller('MetricCtl', ['$scope', '$stateParams', 'MetricService', '$interv
             var metrics = {};
             metrics.resource = identityName;
             // metrics.data = identityDatas;
+
+            let avg
+            if(identityDatas.length == 0){
+              avg = 0
+            }
+            else{
+              let sum = identityDatas.reduce((a, b)=>{
+                return a + b.passQps
+              }, 0)
+              // console.log(sum)
+              avg = (sum / identityDatas.length).toFixed(2)
+            }
+            
             metrics.data = fillZeros(identityDatas);
+            metrics.avg = avg;
+            // console.log(metrics.data)
             metrics.shortData = lastOfArray(identityDatas, 6);
             $scope.metrics.push(metrics);
           });
@@ -399,7 +402,6 @@ app.controller('MetricCtl', ['$scope', '$stateParams', 'MetricService', '$interv
         } else {
           ngDialog.closeAll();
           $scope.emptyServices = true;
-          console.log(data.msg);
           //错误提醒
           ngDialog.open({ template: '<p>提示</p><span>'+data.msg+'</span>',plain:true });
         }
@@ -423,7 +425,8 @@ app.controller('MetricCtl', ['$scope', '$stateParams', 'MetricService', '$interv
               "successQps": 0,
               "exception": 0,
               "rt": 0,
-              "count": 0
+              "count": 0,
+              "avg": 0
             })
           }
         }
